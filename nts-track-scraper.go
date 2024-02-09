@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"regexp"
 
 	"github.com/gocolly/colly"
@@ -14,6 +16,8 @@ type Track struct {
 
 func main() {
 	fmt.Println("Running...")
+
+	tracks := make([]*Track, 0)
 
 	c := colly.NewCollector(
 		colly.URLFilters(
@@ -40,13 +44,20 @@ func main() {
 
 		fmt.Printf("Track found: %s by %s\n", title, artist)
 
-		// track := Track{
-		// 	Title:  title,
-		// 	Artist: artist,
-		// }
+		track := &Track{
+			Title:  title,
+			Artist: artist,
+		}
+
+		tracks = append(tracks, track)
 	})
 
 	c.Visit("https://www.nts.live/explore?genres[]=housetechno-techno&genres[]=housetechno-acid")
+
+	tracksJson, _ := json.Marshal(tracks)
+	fmt.Println(string(tracksJson))
+
+	os.WriteFile("tracks.json", tracksJson, 0644)
 
 	fmt.Println("Complete.")
 }
