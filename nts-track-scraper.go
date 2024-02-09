@@ -7,6 +7,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
+type Track struct {
+	Title  string
+	Artist string
+}
+
 func main() {
 	fmt.Println("Running...")
 
@@ -29,8 +34,16 @@ func main() {
 		c.Visit(h.Request.AbsoluteURL(link))
 	})
 
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting...", r.URL.String())
+	c.OnHTML("div.track__detail", func(h *colly.HTMLElement) {
+		title := h.ChildText("span.track__title")
+		artist := h.ChildText("span.track__artist--mobile")
+
+		fmt.Printf("Track found: %s by %s\n", title, artist)
+
+		// track := Track{
+		// 	Title:  title,
+		// 	Artist: artist,
+		// }
 	})
 
 	c.Visit("https://www.nts.live/explore?genres[]=housetechno-techno&genres[]=housetechno-acid")
